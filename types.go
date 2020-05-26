@@ -47,7 +47,7 @@ type VirtualMachineObject struct {
 	AccountID            string                           `json:"accountId,omitempty"`
 	AddDate              string                           `json:"addDate,omitempty"`
 	Architecture         string                           `json:"architecture,omitempty"`
-	BlockedPorts         []string                         `json:"blockedPorts,omitempty"`
+	BlockedPorts         []int                            `json:"blockedPorts,omitempty"`
 	CPUNumber            int                              `json:"cpuNumber,omitempty"`
 	DeletionScheduledFor string                           `json:"deletionScheduledFor,omitempty"`
 	Description          string                           `json:"description,omitempty"`
