@@ -57,6 +57,7 @@ type VirtualMachineObject struct {
 	ID                   string                           `json:"id,omitempty"`
 	IPAddress            string                           `json:"ipAddress,omitempty"`
 	LastChangeDate       string                           `json:"lastChangeDate,omitempty"`
+	ManagementType       string                           `json:"managementType,omitempty"`
 	Memory               int                              `json:"memory,omitempty"`
 	Name                 string                           `json:"name,omitempty"`
 	NetworkInterfaces    []VirtualMachineNetworkInterface `json:"networkInterfaces,omitempty"`
