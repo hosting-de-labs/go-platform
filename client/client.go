@@ -1,4 +1,4 @@
-package platform
+package client
 
 import (
 	"bytes"

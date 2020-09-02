@@ -1,24 +1,4 @@
-package platform
-
-type IPNetworkType string
-
-const (
-	IPNetworkTypeIPv4 IPNetworkType = "v4"
-	IPNetworkTypeIPv6 IPNetworkType = "v6"
-)
-
-type Metadata struct {
-	ClientTransactionID string `json:"clientTransactionId,omitempty"`
-	ServerTransactionID string `json:"serverTransactionId,omitempty"`
-}
-
-type GenericResultMetadata struct {
-	Limit        int    `json:"limit,omitempty"`
-	Page         int    `json:"page,omitempty"`
-	TotalEntries int    `json:"totalEntries,omitempty"`
-	TotalPages   int    `json:"totalPages,omitempty"`
-	Type         string `json:"type,omitempty"`
-}
+package model
 
 type VirtualMachineDisk struct {
 	Size int `json:"size,omitempty"`
@@ -43,6 +23,19 @@ type VirtualMachineNetworkInterface struct {
 	IPAddresses []VirtualMachineNetworkInterfaceIPAddress `json:"ipAddresses,omitempty"`
 }
 
+type VirtualMachineManagementType string
+
+const (
+	// VirtualMachineManagementTypeNone is defined for a virtual machine that is unmanaged
+	VirtualMachineManagementTypeNone VirtualMachineManagementType = "none"
+
+	// VirtualMachineManagementTypeManaged is defined for a virtual machine that is (platform-) managed
+	VirtualMachineManagementTypeManaged VirtualMachineManagementType = "managed"
+
+	// VirtualMachineManagementTypeIndividual is defined for a virtual machine that is individually managed
+	VirtualMachineManagementTypeIndividual VirtualMachineManagementType = "individual"
+)
+
 type VirtualMachineObject struct {
 	AccountID            string                           `json:"accountId,omitempty"`
 	AddDate              string                           `json:"addDate,omitempty"`
@@ -57,7 +50,7 @@ type VirtualMachineObject struct {
 	ID                   string                           `json:"id,omitempty"`
 	IPAddress            string                           `json:"ipAddress,omitempty"`
 	LastChangeDate       string                           `json:"lastChangeDate,omitempty"`
-	ManagementType       string                           `json:"managementType,omitempty"`
+	ManagementType       VirtualMachineManagementType     `json:"managementType,omitempty"`
 	Memory               int                              `json:"memory,omitempty"`
 	Name                 string                           `json:"name,omitempty"`
 	NetworkInterfaces    []VirtualMachineNetworkInterface `json:"networkInterfaces,omitempty"`
@@ -87,31 +80,4 @@ type VirtualMachineResult struct {
 
 	Status   string
 	Warnings []string
-}
-
-type VirtualMachineHostObject struct {
-	AccountID         string `json:"accountId,omitempty"`
-	AddDate           string `json:"addDate,omitempty"`
-	HostName          string `json:"hostName,omitempty"`
-	ID                string `json:"id,omitempty"`
-	Ignore            bool   `json:"ignore,omitempty"`
-	LastChangeDate    string `json:"lastChangeDate,omitempty"`
-	PhysicalMachineID string `json:"physicalMachineId,omitempty"`
-	PoolID            string `json:"poolId,omitempty"`
-	Priority          int    `json:"priority,omitempty"`
-	Type              string `json:"type,omitempty"`
-}
-
-type FindVirtualMachineHostsResult struct {
-	GenericResultMetadata
-
-	Data []VirtualMachineHostObject `json:"data,omitempty"`
-}
-
-type VirtualMachineHostsResult struct {
-	Metadata Metadata                      `json:"metadata,omitempty"`
-	Response FindVirtualMachineHostsResult `json:"response,omitempty"`
-
-	Status   string   `json:"status,omitempty"`
-	Warnings []string `json:"warnings,omitempty"`
 }
