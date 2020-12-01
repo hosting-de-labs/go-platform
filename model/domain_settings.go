@@ -1,6 +1,6 @@
 package model
 
-type DomainSettingObject struct {
+type DomainSettingsObject struct {
 	BundleID                      string `json:"bundleId,omitempty"`
 	DomainName                    string `json:"domainName,omitempty"`
 	DomainNameUnicode             string `json:"domainNameUnicode,omitempty"`
@@ -17,7 +17,7 @@ type DomainSettingObject struct {
 type FindDomainSettingsResult struct {
 	GenericResultMetadata
 
-	Data []DomainSettingObject `json:"data,omitempty"`
+	Data []DomainSettingsObject `json:"data,omitempty"`
 }
 
 type DomainSettingsResult struct {
