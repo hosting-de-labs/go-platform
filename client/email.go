@@ -7,9 +7,9 @@ import (
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) (*[]model.DomainSettingObject, error) {
+func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) (*[]model.DomainSettingsObject, error) {
 	currentPage := 0
-	var data []model.DomainSettingObject
+	var data []model.DomainSettingsObject
 
 	for {
 		resp, err := c.runRequest("email", "domainSettingsFind", nil, 0, currentPage)
