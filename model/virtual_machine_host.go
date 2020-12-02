@@ -1,16 +1,16 @@
 package model
 
 type VirtualMachineHostObject struct {
-	AccountID         string `json:"accountId,omitempty"`
-	AddDate           string `json:"addDate,omitempty"`
-	HostName          string `json:"hostName,omitempty"`
 	ID                string `json:"id,omitempty"`
+	AccountID         string `json:"accountId,omitempty"`
+	PoolID            string `json:"poolId,omitempty"`
+	ResourceType      string `json:"resourceType,omitempty"`
+	HostName          string `json:"hostName,omitempty"`
+	Priority          int    `json:"priority,omitempty"`
 	Ignore            bool   `json:"ignore,omitempty"`
+	AddDate           string `json:"addDate,omitempty"`
 	LastChangeDate    string `json:"lastChangeDate,omitempty"`
 	PhysicalMachineID string `json:"physicalMachineId,omitempty"`
-	PoolID            string `json:"poolId,omitempty"`
-	Priority          int    `json:"priority,omitempty"`
-	Type              string `json:"type,omitempty"`
 }
 
 type FindVirtualMachineHostsResult struct {
