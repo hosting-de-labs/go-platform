@@ -12,6 +12,8 @@ func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) (*[]model.DomainSe
 	var data []model.DomainSettingsObject
 
 	getPage := func(pageNum int) (pageData *model.DomainSettingsResult, err error) {
+		pageData = new(model.DomainSettingsResult)
+
 		resp, err := c.runRequest("email", "domainSettingsFind", nil, 0, currentPage)
 		if err != nil {
 			return nil, err
