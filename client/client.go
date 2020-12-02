@@ -29,7 +29,7 @@ const (
 	SubFilterConnectiveAnd SubFilterConnective = "AND"
 
 	FilterRelationEqual        FilterRelation = "equal"
-	FilterRelationUnequal      FilterRelation = "unqueal"
+	FilterRelationUnequal      FilterRelation = "unequal"
 	FilterRelationGreater      FilterRelation = "greater"
 	FilterRelationLess         FilterRelation = "less"
 	FilterRelationGreaterEqual FilterRelation = "greaterEqual"

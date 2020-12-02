@@ -11,29 +11,38 @@ func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]model.
 	currentPage := 0
 	var data []model.VirtualMachineObject
 
-	for {
+	getPage := func(pageNum int) (pageData *model.VirtualMachineResult, err error) {
+		pageData = new(model.VirtualMachineResult)
+
 		resp, err := c.runRequest("machine", "virtualMachinesFind", nil, 0, currentPage)
 		if err != nil {
 			return nil, err
 		}
-
 		defer resp.Body.Close()
+
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
 
-		virtualMachineResult := new(model.VirtualMachineResult)
-
-		err = json.Unmarshal(body, virtualMachineResult)
+		err = json.Unmarshal(body, pageData)
 		if err != nil {
 			return nil, err
 		}
 
-		data = append(data, virtualMachineResult.Response.Data...)
-		currentPage = virtualMachineResult.Response.Page
+		return pageData, nil
+	}
 
-		if currentPage >= virtualMachineResult.Response.TotalPages {
+	for {
+		pageData, err := getPage(currentPage)
+		if err != nil {
+			return nil, err
+		}
+
+		data = append(data, pageData.Response.Data...)
+		currentPage = pageData.Response.Page
+
+		if currentPage >= pageData.Response.TotalPages {
 			break
 		}
 
