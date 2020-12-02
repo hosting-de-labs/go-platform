@@ -12,6 +12,8 @@ func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]model.
 	var data []model.VirtualMachineObject
 
 	getPage := func(pageNum int) (pageData *model.VirtualMachineResult, err error) {
+		pageData = new(model.VirtualMachineResult)
+
 		resp, err := c.runRequest("machine", "virtualMachinesFind", nil, 0, currentPage)
 		if err != nil {
 			return nil, err
