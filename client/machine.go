@@ -1,13 +1,15 @@
-package platform
+package client
 
 import (
 	"encoding/json"
 	"io/ioutil"
+
+	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]VirtualMachineObject, error) {
+func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]model.VirtualMachineObject, error) {
 	currentPage := 0
-	var data []VirtualMachineObject
+	var data []model.VirtualMachineObject
 
 	for {
 		resp, err := c.runRequest("machine", "virtualMachinesFind", nil, 0, currentPage)
@@ -21,7 +23,7 @@ func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]Virtua
 			return nil, err
 		}
 
-		virtualMachineResult := new(VirtualMachineResult)
+		virtualMachineResult := new(model.VirtualMachineResult)
 
 		err = json.Unmarshal(body, virtualMachineResult)
 		if err != nil {

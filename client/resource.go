@@ -1,11 +1,13 @@
-package platform
+package client
 
 import (
 	"encoding/json"
 	"io/ioutil"
+
+	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) (*[]VirtualMachineHostObject, error) {
+func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) (*[]model.VirtualMachineHostObject, error) {
 	resp, err := c.runRequest("resource", "virtualMachineHostsFind", filter, 0, 0)
 	if err != nil {
 		return nil, err
@@ -17,7 +19,7 @@ func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) (*[]V
 		panic(err)
 	}
 
-	hosts := new(VirtualMachineHostsResult)
+	hosts := &model.VirtualMachineHostsResult{}
 
 	err = json.Unmarshal(body, hosts)
 	if err != nil {
