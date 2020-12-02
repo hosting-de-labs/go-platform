@@ -11,29 +11,36 @@ func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) (*[]model.DomainSe
 	currentPage := 0
 	var data []model.DomainSettingsObject
 
-	for {
+	getPage := func(pageNum int) (pageData *model.DomainSettingsResult, err error) {
 		resp, err := c.runRequest("email", "domainSettingsFind", nil, 0, currentPage)
 		if err != nil {
 			return nil, err
 		}
-
 		defer resp.Body.Close()
+
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
 
-		domainSettingsResult := new(model.DomainSettingsResult)
-
-		err = json.Unmarshal(body, domainSettingsResult)
+		err = json.Unmarshal(body, pageData)
 		if err != nil {
 			return nil, err
 		}
 
-		data = append(data, domainSettingsResult.Response.Data...)
-		currentPage = domainSettingsResult.Response.Page
+		return pageData, nil
+	}
 
-		if currentPage >= domainSettingsResult.Response.TotalPages {
+	for {
+		pageData, err := getPage(currentPage)
+		if err != nil {
+			return nil, err
+		}
+
+		data = append(data, pageData.Response.Data...)
+		currentPage = pageData.Response.Page
+
+		if currentPage >= pageData.Response.TotalPages {
 			break
 		}
 
