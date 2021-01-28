@@ -1,30 +1,22 @@
 package client
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) (*[]model.VirtualMachineHostObject, error) {
-	resp, err := c.runRequest("resource", "virtualMachineHostsFind", filter, 0, 0)
+func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) ([]model.VirtualMachineHostObject, error) {
+	var data []interface{}
+	_, err := c.Iterate(&data, &model.VirtualMachineHostObject{}, "resource", "virtualMachineHostsFind", filter, 0)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("domain settings find: %s", err)
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
+	out := []model.VirtualMachineHostObject{}
+	for i := 0; i < len(data); i++ {
+		out = append(out, *data[i].(*model.VirtualMachineHostObject))
 	}
 
-	hosts := &model.VirtualMachineHostsResult{}
-
-	err = json.Unmarshal(body, hosts)
-	if err != nil {
-		panic(err)
-	}
-
-	return &hosts.Response.Data, nil
+	return out, nil
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hosting-de-labs/go-platform/model"
@@ -96,15 +95,4 @@ func (c *ApiClient) Get(endpoint string, rpcMethod string, filter *RequestFilter
 // Update fires a generic request that carries data to the server
 func (c *ApiClient) Update(endpoint string, rpcMethod string, data interface{}) (*resty.Response, error) {
 	return nil, fmt.Errorf("update: not implemented")
-}
-
-// runRequest
-// Deprecated: Use Request() method insted
-func (c *ApiClient) runRequest(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*http.Response, error) {
-	resp, err := c.Get(endpoint, rpcMethod, filter, limit, page)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp.RawResponse, nil
 }

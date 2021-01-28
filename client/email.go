@@ -1,53 +1,22 @@
 package client
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) (*[]model.DomainSettingsObject, error) {
-	currentPage := 0
-	var data []model.DomainSettingsObject
-
-	getPage := func(pageNum int) (pageData *model.DomainSettingsResult, err error) {
-		pageData = new(model.DomainSettingsResult)
-
-		resp, err := c.runRequest("email", "domainSettingsFind", nil, 0, currentPage)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(body, pageData)
-		if err != nil {
-			return nil, err
-		}
-
-		return pageData, nil
+func (c *ApiClient) DomainSettingsFind(filter *RequestFilter) ([]model.DomainSettingsObject, error) {
+	var data []interface{}
+	_, err := c.Iterate(&data, &model.DomainSettingsObject{}, "email", "domainSettingsFind", filter, 0)
+	if err != nil {
+		return nil, fmt.Errorf("domain settings find: %s", err)
 	}
 
-	for {
-		pageData, err := getPage(currentPage)
-		if err != nil {
-			return nil, err
-		}
-
-		data = append(data, pageData.Response.Data...)
-		currentPage = pageData.Response.Page
-
-		if currentPage >= pageData.Response.TotalPages {
-			break
-		}
-
-		currentPage++
+	out := []model.DomainSettingsObject{}
+	for i := 0; i < len(data); i++ {
+		out = append(out, *data[i].(*model.DomainSettingsObject))
 	}
 
-	return &data, nil
+	return out, nil
 }

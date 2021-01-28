@@ -1,53 +1,22 @@
 package client
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) (*[]model.VirtualMachineObject, error) {
-	currentPage := 0
-	var data []model.VirtualMachineObject
-
-	getPage := func(pageNum int) (pageData *model.VirtualMachineResult, err error) {
-		pageData = new(model.VirtualMachineResult)
-
-		resp, err := c.runRequest("machine", "virtualMachinesFind", nil, 0, currentPage)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(body, pageData)
-		if err != nil {
-			return nil, err
-		}
-
-		return pageData, nil
+func (c *ApiClient) MachineVirtualMachinesFind(filter *RequestFilter) ([]model.VirtualMachineObject, error) {
+	var data []interface{}
+	_, err := c.Iterate(&data, &model.VirtualMachineObject{}, "machine", "virtualMachinesFind", filter, 0)
+	if err != nil {
+		return nil, fmt.Errorf("domain settings find: %s", err)
 	}
 
-	for {
-		pageData, err := getPage(currentPage)
-		if err != nil {
-			return nil, err
-		}
-
-		data = append(data, pageData.Response.Data...)
-		currentPage = pageData.Response.Page
-
-		if currentPage >= pageData.Response.TotalPages {
-			break
-		}
-
-		currentPage++
+	out := []model.VirtualMachineObject{}
+	for i := 0; i < len(data); i++ {
+		out = append(out, *data[i].(*model.VirtualMachineObject))
 	}
 
-	return &data, nil
+	return out, nil
 }
