@@ -18,17 +18,3 @@ type ZoneConfigObject struct {
 	LastChangeDate        string               `json:"lastChangeDate,omitempty"`
 	AddDate               string               `json:"addDate,omitempty"`
 }
-
-type FindZoneConfigsResult struct {
-	ResponseMetadata
-
-	Data []ZoneConfigObject `json:"data,omitempty"`
-}
-
-type ZoneConfigsResult struct {
-	Metadata Metadata              `json:"metadata,omitempty"`
-	Response FindZoneConfigsResult `json:"response,omitempty"`
-
-	Status   string
-	Warnings []string
-}

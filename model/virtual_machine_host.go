@@ -12,17 +12,3 @@ type VirtualMachineHostObject struct {
 	LastChangeDate    string `json:"lastChangeDate,omitempty"`
 	PhysicalMachineID string `json:"physicalMachineId,omitempty"`
 }
-
-type FindVirtualMachineHostsResult struct {
-	ResponseMetadata
-
-	Data []VirtualMachineHostObject `json:"data,omitempty"`
-}
-
-type VirtualMachineHostsResult struct {
-	Metadata Metadata                      `json:"metadata,omitempty"`
-	Response FindVirtualMachineHostsResult `json:"response,omitempty"`
-
-	Status   string   `json:"status,omitempty"`
-	Warnings []string `json:"warnings,omitempty"`
-}
