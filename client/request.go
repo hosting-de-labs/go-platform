@@ -1,8 +1,6 @@
 package client
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -15,7 +13,7 @@ type GenericRequestBody struct {
 }
 
 func (c *ApiClient) runRequest(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*http.Response, error) {
-	reqBody := new(GenericRequestBody)
+	reqBody := &GenericRequestBody{}
 	reqBody.AuthToken = c.token
 
 	if filter != nil {
@@ -32,24 +30,16 @@ func (c *ApiClient) runRequest(endpoint string, rpcMethod string, filter *Reques
 		reqBody.Page = page
 	}
 
-	requestBodyBytes, err := json.Marshal(reqBody)
-	if err != nil {
-		return nil, err
-	}
+	requestURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod), bytes.NewBuffer(requestBodyBytes))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := c.client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(reqBody).
+		Post(requestURL)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("request failed: %s", err)
 	}
 
-	return resp, nil
+	return resp.RawResponse, nil
 }

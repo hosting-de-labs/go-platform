@@ -1,9 +1,13 @@
 package client
 
+import "github.com/go-resty/resty/v2"
+
 type ApiClient struct {
 	url   string
 	token string
 	limit int
+
+	client *resty.Client
 }
 
 func NewApiClient(url string, token string, limit int) *ApiClient {
@@ -16,6 +20,8 @@ func NewApiClient(url string, token string, limit int) *ApiClient {
 	if limit > 0 {
 		c.limit = limit
 	}
+
+	c.client = resty.New()
 
 	return c
 }
