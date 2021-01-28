@@ -6,14 +6,18 @@ import (
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) ResourceVirtualMachineHostsFind(filter *RequestFilter) ([]model.VirtualMachineHostObject, error) {
+type Resource struct {
+	c *ApiClient
+}
+
+func (r *Resource) ResourceVirtualMachineHostsFind(filter *RequestFilter) ([]model.VirtualMachineHostObject, error) {
 	var data []interface{}
-	_, err := c.Iterate(&data, &model.VirtualMachineHostObject{}, "resource", "virtualMachineHostsFind", filter, 0)
+	_, err := r.c.Iterate(&data, &model.VirtualMachineHostObject{}, "resource", "virtualMachineHostsFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("domain settings find: %s", err)
 	}
 
-	out := []model.VirtualMachineHostObject{}
+	var out []model.VirtualMachineHostObject
 	for i := 0; i < len(data); i++ {
 		out = append(out, *data[i].(*model.VirtualMachineHostObject))
 	}

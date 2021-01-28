@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/hosting-de-labs/go-platform/client"
 )
@@ -12,8 +13,8 @@ func main() {
 		Value: "aac1.dc.zone",
 	}
 
-	c := client.NewApiClient("https://secure.hosting.de/api/", "jk$+xe5xm$6?np$MR-+(ieih%t$?m?f?AA%eqYSW/Y/c?$75", 250)
-	res, err := c.ZonesFind(filter)
+	c := client.NewApiClient("https://secure.hosting.de/api/", os.Getenv("PLATFORM_TOKEN"), 250)
+	res, err := c.Dns.ZonesFind(filter)
 	if err != nil {
 		panic(err)
 	}

@@ -38,6 +38,10 @@ func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string,
 			return 0, fmt.Errorf("iterate failed: %s", err)
 		}
 
+		if len(currentPageBody.Errors) > 0 {
+			return 0, fmt.Errorf("iterate: %s", currentPageBody.Errors[0].Text)
+		}
+
 		totalObjects += len(currentPageBody.Response.Data)
 
 		for _, r := range currentPageBody.Response.Data {
@@ -92,6 +96,19 @@ func (c *ApiClient) Get(endpoint string, rpcMethod string, filter *RequestFilter
 }
 
 // Update fires a generic request that carries data to the server
-func (c *ApiClient) Update(endpoint string, rpcMethod string, data interface{}) (*resty.Response, error) {
-	return nil, fmt.Errorf("update: not implemented")
+func (c *ApiClient) Update(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
+	requestURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
+
+	base64Token := base64.StdEncoding.EncodeToString([]byte(c.token))
+	resp, err := c.client.R().
+		SetHeader("Authorization", "Bearer "+base64Token).
+		SetHeader("Content-Type", "application/json").
+		SetBody(body).
+		Post(requestURL)
+
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %s", err)
+	}
+
+	return resp, nil
 }

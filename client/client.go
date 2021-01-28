@@ -3,6 +3,11 @@ package client
 import "github.com/go-resty/resty/v2"
 
 type ApiClient struct {
+	Dns      Dns
+	Email    Email
+	Machine  Machine
+	Resource Resource
+
 	url   string
 	token string
 	limit int
@@ -11,7 +16,7 @@ type ApiClient struct {
 }
 
 func NewApiClient(url string, token string, limit int) *ApiClient {
-	c := new(ApiClient)
+	c := &ApiClient{}
 
 	c.url = url
 	c.token = token
@@ -22,6 +27,11 @@ func NewApiClient(url string, token string, limit int) *ApiClient {
 	}
 
 	c.client = resty.New()
+
+	c.Dns.c = c
+	c.Email.c = c
+	c.Machine.c = c
+	c.Resource.c = c
 
 	return c
 }
