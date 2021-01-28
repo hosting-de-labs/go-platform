@@ -23,7 +23,7 @@ func (c *ApiClient) ZonesFind(filter *RequestFilter) ([]model.ZoneObject, error)
 
 func (c *ApiClient) ZoneConfigsFind(filter *RequestFilter) ([]model.ZoneConfigObject, error) {
 	var data []interface{}
-	_, err := c.Iterate(&data, &model.ZoneConfigObject{}, "dns", "zoneConfigsFind", nil, 0)
+	_, err := c.Iterate(&data, &model.ZoneConfigObject{}, "dns", "zoneConfigsFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("zones find: %s", err)
 	}
