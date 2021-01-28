@@ -1,4 +1,4 @@
-package model
+package client
 
 type Metadata struct {
 	ClientTransactionID string `json:"clientTransactionId,omitempty"`
@@ -21,13 +21,6 @@ type Response struct {
 		Data []map[string]interface{} `json:"data,omitempty"`
 	} `json:"response,omitempty"`
 
-	Status string
-	Errors []struct {
-		Code          int
-		ContextObject string
-		ContextPath   string
-		Details       map[string]string
-		Text          string
-		Value         string
-	}
+	Status string  `json:"status,omitempty"`
+	Errors []Error `json:"errors,omitempty"`
 }

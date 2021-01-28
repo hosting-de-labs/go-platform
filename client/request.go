@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/hosting-de-labs/go-platform/model"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -33,7 +32,7 @@ func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string,
 			return 0, fmt.Errorf("iterate failed: %s", err)
 		}
 
-		var currentPageBody model.Response
+		var currentPageBody Response
 		err = json.Unmarshal(resp.Body(), &currentPageBody)
 		if err != nil {
 			return 0, fmt.Errorf("iterate failed: %s", err)
