@@ -20,7 +20,7 @@ type ZoneConfigObject struct {
 }
 
 type FindZoneConfigsResult struct {
-	GenericResultMetadata
+	ResponseMetadata
 
 	Data []ZoneConfigObject `json:"data,omitempty"`
 }

@@ -1,26 +1,27 @@
 package client
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hosting-de-labs/go-platform/model"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
 	IterateDefaultLimit = 250
 )
 
-type GenericRequestBody struct {
-	AuthToken string         `json:"authToken,omitempty"`
-	Limit     int            `json:"limit,omitempty"`
-	Page      int            `json:"page,omitempty"`
-	Filter    *RequestFilter `json:"filter,omitempty"`
+type GetRequest struct {
+	Limit  int            `json:"limit,omitempty"`
+	Page   int            `json:"page,omitempty"`
+	Filter *RequestFilter `json:"filter,omitempty"`
 }
 
-func (c *ApiClient) Iterate(data []interface{}, endpoint string, rpcMethod string, filter *RequestFilter, page int) (int, error) {
+func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string, rpcMethod string, filter *RequestFilter, page int) (int, error) {
 	totalObjects := 0
 	for i := 0; ; i++ {
 		currentPage := 1 + i
@@ -28,21 +29,29 @@ func (c *ApiClient) Iterate(data []interface{}, endpoint string, rpcMethod strin
 			currentPage = page + i
 		}
 
-		resp, err := c.Request(endpoint, rpcMethod, filter, IterateDefaultLimit, currentPage)
+		resp, err := c.Get(endpoint, rpcMethod, filter, IterateDefaultLimit, currentPage)
 		if err != nil {
 			return 0, fmt.Errorf("iterate failed: %s", err)
 		}
 
-		var currentPageBody model.GenericResult
+		var currentPageBody model.Response
 		err = json.Unmarshal(resp.Body(), &currentPageBody)
 		if err != nil {
-			return 0, err
+			return 0, fmt.Errorf("iterate failed: %s", err)
 		}
 
-		totalObjects += len(currentPageBody.Data)
+		totalObjects += len(currentPageBody.Response.Data)
 
-		data = append(data, currentPageBody.Data...)
-		if currentPage == currentPageBody.TotalPages {
+		for _, r := range currentPageBody.Response.Data {
+			err := mapstructure.Decode(r, &T)
+			if err != nil {
+				panic(err)
+			}
+
+			*data = append(*data, T)
+		}
+
+		if currentPage >= currentPageBody.Response.TotalPages {
 			break
 		}
 	}
@@ -50,10 +59,9 @@ func (c *ApiClient) Iterate(data []interface{}, endpoint string, rpcMethod strin
 	return totalObjects, nil
 }
 
-// Request fires a generic request.
-func (c *ApiClient) Request(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*resty.Response, error) {
-	reqBody := &GenericRequestBody{}
-	reqBody.AuthToken = c.token
+// Get fires a generic request that will not push any further data to the api.
+func (c *ApiClient) Get(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*resty.Response, error) {
+	reqBody := &GetRequest{}
 
 	if filter != nil {
 		reqBody.Filter = filter
@@ -71,7 +79,9 @@ func (c *ApiClient) Request(endpoint string, rpcMethod string, filter *RequestFi
 
 	requestURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
 
+	base64Token := base64.StdEncoding.EncodeToString([]byte(c.token))
 	resp, err := c.client.R().
+		SetHeader("Authorization", "Bearer "+base64Token).
 		SetHeader("Content-Type", "application/json").
 		SetBody(reqBody).
 		Post(requestURL)
@@ -83,10 +93,15 @@ func (c *ApiClient) Request(endpoint string, rpcMethod string, filter *RequestFi
 	return resp, nil
 }
 
+// Update fires a generic request that carries data to the server
+func (c *ApiClient) Update(endpoint string, rpcMethod string, data interface{}) (*resty.Response, error) {
+	return nil, fmt.Errorf("update: not implemented")
+}
+
 // runRequest
 // Deprecated: Use Request() method insted
 func (c *ApiClient) runRequest(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*http.Response, error) {
-	resp, err := c.Request(endpoint, rpcMethod, filter, limit, page)
+	resp, err := c.Get(endpoint, rpcMethod, filter, limit, page)
 	if err != nil {
 		return nil, err
 	}

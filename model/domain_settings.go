@@ -15,7 +15,7 @@ type DomainSettingsObject struct {
 }
 
 type FindDomainSettingsResult struct {
-	GenericResultMetadata
+	ResponseMetadata
 
 	Data []DomainSettingsObject `json:"data,omitempty"`
 }

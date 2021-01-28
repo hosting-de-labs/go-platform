@@ -73,7 +73,7 @@ type VirtualMachineObject struct {
 }
 
 type FindVirtualMachinesResult struct {
-	GenericResultMetadata
+	ResponseMetadata
 
 	Data []VirtualMachineObject `json:"data,omitempty"`
 }

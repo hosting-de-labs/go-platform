@@ -14,7 +14,7 @@ type VirtualMachineHostObject struct {
 }
 
 type FindVirtualMachineHostsResult struct {
-	GenericResultMetadata
+	ResponseMetadata
 
 	Data []VirtualMachineHostObject `json:"data,omitempty"`
 }

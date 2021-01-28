@@ -1,98 +1,37 @@
 package client
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
-func (c *ApiClient) ZonesFind(filter *RequestFilter) (*[]model.ZoneObject, error) {
-	currentPage := 0
-	var data []model.ZoneObject
-
-	getPage := func(pageNum int) (pageData *model.ZonesResult, err error) {
-		pageData = new(model.ZonesResult)
-
-		resp, err := c.runRequest("email", "zonesFind", nil, 0, currentPage)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(body, pageData)
-		if err != nil {
-			return nil, err
-		}
-
-		return pageData, nil
+func (c *ApiClient) ZonesFind(filter *RequestFilter) ([]model.ZoneObject, error) {
+	var data []interface{}
+	_, err := c.Iterate(&data, &model.ZoneObject{}, "dns", "zonesFind", filter, 0)
+	if err != nil {
+		return nil, fmt.Errorf("zones find: %s", err)
 	}
 
-	for {
-		pageData, err := getPage(currentPage)
-		if err != nil {
-			return nil, err
-		}
-
-		data = append(data, pageData.Response.Data...)
-		currentPage = pageData.Response.Page
-
-		if currentPage >= pageData.Response.TotalPages {
-			break
-		}
-
-		currentPage++
+	out := []model.ZoneObject{}
+	for i := 0; i < len(data); i++ {
+		out = append(out, *data[i].(*model.ZoneObject))
 	}
 
-	return &data, nil
+	return out, nil
 }
 
-func (c *ApiClient) ZoneConfigsFind(filter *RequestFilter) (*[]model.ZoneConfigObject, error) {
-	currentPage := 0
-	var data []model.ZoneConfigObject
-
-	getPage := func(pageNum int) (pageData *model.ZoneConfigsResult, err error) {
-		pageData = new(model.ZoneConfigsResult)
-
-		resp, err := c.runRequest("email", "zoneConfigsFind", nil, 0, currentPage)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(body, pageData)
-		if err != nil {
-			return nil, err
-		}
-
-		return pageData, nil
+func (c *ApiClient) ZoneConfigsFind(filter *RequestFilter) ([]model.ZoneConfigObject, error) {
+	var data []interface{}
+	_, err := c.Iterate(&data, &model.ZoneConfigObject{}, "dns", "zoneConfigsFind", nil, 0)
+	if err != nil {
+		return nil, fmt.Errorf("zones find: %s", err)
 	}
 
-	for {
-		pageData, err := getPage(currentPage)
-		if err != nil {
-			return nil, err
-		}
-
-		data = append(data, pageData.Response.Data...)
-		currentPage = pageData.Response.Page
-
-		if currentPage >= pageData.Response.TotalPages {
-			break
-		}
-
-		currentPage++
+	out := []model.ZoneConfigObject{}
+	for i := 0; i < len(data); i++ {
+		out = append(out, *data[i].(*model.ZoneConfigObject))
 	}
 
-	return &data, nil
+	return out, nil
 }
