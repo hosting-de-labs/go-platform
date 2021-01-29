@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"time"
@@ -9,16 +10,28 @@ import (
 	"github.com/hosting-de-labs/go-platform/model"
 )
 
+var (
+	flagBaseUrl     = flag.String("baseUrl", "https://secure.hosting.de/api/", "set api base url")
+	flagZoneName    = flag.String("zoneName", "", "name of dns zone to update")
+	flagRecordName  = flag.String("recordName", "", "name of record to create")
+	flagRecordValue = flag.String("recordValue", "", "value of record to create")
+)
+
 func main() {
-	api := client.NewApiClient("https://secure.hosting.de/api/", os.Getenv("PLATFORM_TOKEN"), 250)
+	flag.Parse()
+
+	if len(*flagZoneName) == 0 || len(*flagRecordName) == 0 || len(*flagRecordValue) == 0 {
+		flag.Usage()
+		os.Exit(2)
+	}
 
 	filter := &client.RequestFilter{
 		Field: "ZoneNameUnicode",
-		Value: "*keenlogics.dev*",
+		Value: *flagZoneName,
 	}
 
-	log.Printf("Searching for keenlogics.dev")
-
+	log.Printf("Searching for " + *flagZoneName)
+	api := client.NewApiClient(*flagBaseUrl, os.Getenv("PLATFORM_TOKEN"), 250)
 	zcs, err := api.Dns.ZoneConfigsFind(filter)
 	if err != nil {
 		panic(err)
@@ -33,9 +46,9 @@ func main() {
 		ZoneConfig: zcs[0],
 		RecordsToAdd: []model.RecordObject{
 			{
-				Name:    "hsokolowski-test.keenlogics.dev",
+				Name:    *flagRecordName + "." + *flagZoneName,
 				Type:    "A",
-				Content: "127.0.0.1",
+				Content: *flagRecordValue,
 				TTL:     int(ttl.Seconds()),
 			},
 		},
