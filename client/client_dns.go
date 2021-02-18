@@ -41,6 +41,48 @@ func (c *Dns) ZonesFind(filter *RequestFilter) ([]model.ZoneObject, error) {
 	return out, nil
 }
 
+type ZoneResponse struct {
+	Response model.ZoneObject
+	DefaultResponse
+}
+
+type ZoneCreateRecreateRequest struct {
+	ZoneConfig              model.ZoneConfigObject `json:"zoneConfig,omitempty"`
+	Records                 []model.RecordObject   `json:"records,omitempty"`
+	NameserverSetID         string                 `json:"nameserverSetId,omitempty"`
+	UseDefaultNameserverSet bool                   `json:"useDefaultNameserverSet,omitempty"`
+}
+
+func (c *Dns) ZoneCreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
+	resp, err := c.c.Update("dns", "zoneCreate", zreq)
+	if err != nil {
+		return nil, fmt.Errorf("zone create: %s", err)
+	}
+
+	var r ZoneResponse
+	err = json.Unmarshal(resp.Body(), &r)
+	if err != nil {
+		return nil, fmt.Errorf("zone create: %s", err)
+	}
+
+	return &r, nil
+}
+
+func (c *Dns) ZoneRecreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
+	resp, err := c.c.Update("dns", "zoneRecreate", zreq)
+	if err != nil {
+		return nil, fmt.Errorf("zone recreate: %s", err)
+	}
+
+	var r ZoneResponse
+	err = json.Unmarshal(resp.Body(), &r)
+	if err != nil {
+		return nil, fmt.Errorf("zone recreate: %s", err)
+	}
+
+	return &r, nil
+}
+
 type ZoneUpdateRequest struct {
 	ZoneConfig      model.ZoneConfigObject `json:"zoneConfig,omitempty"`
 	RecordsToAdd    []model.RecordObject   `json:"recordsToAdd,omitempty"`
@@ -48,26 +90,36 @@ type ZoneUpdateRequest struct {
 	RecordsToDelete []model.RecordObject   `json:"recordsToDelete,omitempty"`
 }
 
-type ZoneUpdateResponse struct {
-	Response model.ZoneObject
-
-	Metadata Metadata
-	Status   string
-
-	Errors   []Error
-	Warnings []Error
-}
-
-func (c *Dns) ZoneUpdate(zreq ZoneUpdateRequest) (*ZoneUpdateResponse, error) {
+func (c *Dns) ZoneUpdate(zreq ZoneUpdateRequest) (*ZoneResponse, error) {
 	resp, err := c.c.Update("dns", "zoneUpdate", zreq)
 	if err != nil {
-		return nil, fmt.Errorf("update: %s", err)
+		return nil, fmt.Errorf("zone update: %s", err)
 	}
 
-	var r ZoneUpdateResponse
+	var r ZoneResponse
 	err = json.Unmarshal(resp.Body(), &r)
 	if err != nil {
 		return nil, fmt.Errorf("zone update: %s", err)
+	}
+
+	return &r, nil
+}
+
+type ZoneDeleteRequest struct {
+	ZoneConfigID string `json:"zoneConfigId,omitempty"`
+	ZoneName     string `json:"zoneName,omitempty"`
+}
+
+func (c *Dns) ZoneDelete(zreq ZoneDeleteRequest) (*DefaultResponse, error) {
+	resp, err := c.c.Update("dns", "zoneDelete", zreq)
+	if err != nil {
+		return nil, fmt.Errorf("zone delete: %s", err)
+	}
+
+	var r DefaultResponse
+	err = json.Unmarshal(resp.Body(), &r)
+	if err != nil {
+		return nil, fmt.Errorf("zone delete: %s", err)
 	}
 
 	return &r, nil
