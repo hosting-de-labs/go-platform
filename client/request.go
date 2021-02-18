@@ -32,7 +32,7 @@ func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string,
 			return 0, fmt.Errorf("iterate failed: %s", err)
 		}
 
-		var currentPageBody Response
+		var currentPageBody DataResponse
 		err = json.Unmarshal(resp.Body(), &currentPageBody)
 		if err != nil {
 			return 0, fmt.Errorf("iterate failed: %s", err)

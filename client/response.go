@@ -13,14 +13,18 @@ type ResponseMetadata struct {
 	Type         string `json:"type,omitempty"`
 }
 
-type Response struct {
+type EmptyResponse struct {
 	Metadata Metadata `json:"metadata,omitempty"`
+	Status   string   `json:"status,omitempty"`
+	Errors   []Error  `json:"errors,omitempty"`
+	Warnings []Error  `json:"warnings,omitempty"`
+}
+
+type DataResponse struct {
+	EmptyResponse
 	Response struct {
 		ResponseMetadata
 
 		Data []map[string]interface{} `json:"data,omitempty"`
 	} `json:"response,omitempty"`
-
-	Status string  `json:"status,omitempty"`
-	Errors []Error `json:"errors,omitempty"`
 }

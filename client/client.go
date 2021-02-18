@@ -15,14 +15,6 @@ type ApiClient struct {
 	client *resty.Client
 }
 
-type DefaultResponse struct {
-	Metadata Metadata
-	Status   string
-
-	Errors   []Error
-	Warnings []Error
-}
-
 func NewApiClient(url string, token string, limit int) *ApiClient {
 	c := &ApiClient{}
 

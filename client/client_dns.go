@@ -43,7 +43,7 @@ func (c *Dns) ZonesFind(filter *RequestFilter) ([]model.ZoneObject, error) {
 
 type ZoneResponse struct {
 	Response model.ZoneObject
-	DefaultResponse
+	EmptyResponse
 }
 
 type ZoneCreateRecreateRequest struct {
@@ -110,13 +110,13 @@ type ZoneDeleteRequest struct {
 	ZoneName     string `json:"zoneName,omitempty"`
 }
 
-func (c *Dns) ZoneDelete(zreq ZoneDeleteRequest) (*DefaultResponse, error) {
+func (c *Dns) ZoneDelete(zreq ZoneDeleteRequest) (*EmptyResponse, error) {
 	resp, err := c.c.Update("dns", "zoneDelete", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone delete: %s", err)
 	}
 
-	var r DefaultResponse
+	var r EmptyResponse
 	err = json.Unmarshal(resp.Body(), &r)
 	if err != nil {
 		return nil, fmt.Errorf("zone delete: %s", err)
