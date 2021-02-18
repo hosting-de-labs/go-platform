@@ -13,17 +13,3 @@ type DomainSettingsObject struct {
 	AddDate                       string `json:"addDate,omitempty"`
 	LastChangeDate                string `json:"lastChangeDate,omitempty"`
 }
-
-type FindDomainSettingsResult struct {
-	GenericResultMetadata
-
-	Data []DomainSettingsObject `json:"data,omitempty"`
-}
-
-type DomainSettingsResult struct {
-	Metadata Metadata                 `json:"metadata,omitempty"`
-	Response FindDomainSettingsResult `json:"response,omitempty"`
-
-	Status   string
-	Warnings []string
-}

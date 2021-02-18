@@ -71,17 +71,3 @@ type VirtualMachineObject struct {
 	AddDate              string                           `json:"addDate,omitempty"`
 	LastChangeDate       string                           `json:"lastChangeDate,omitempty"`
 }
-
-type FindVirtualMachinesResult struct {
-	GenericResultMetadata
-
-	Data []VirtualMachineObject `json:"data,omitempty"`
-}
-
-type VirtualMachineResult struct {
-	Metadata Metadata                  `json:"metadata,omitempty"`
-	Response FindVirtualMachinesResult `json:"response,omitempty"`
-
-	Status   string
-	Warnings []string
-}
