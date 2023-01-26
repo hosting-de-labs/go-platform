@@ -29,13 +29,13 @@ func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string,
 
 		resp, err := c.Get(endpoint, rpcMethod, filter, IterateDefaultLimit, currentPage)
 		if err != nil {
-			return 0, fmt.Errorf("iterate failed: %s", err)
+			return 0, fmt.Errorf("iterate get failed: %s", err)
 		}
 
 		var currentPageBody DataResponse
 		err = json.Unmarshal(resp.Body(), &currentPageBody)
 		if err != nil {
-			return 0, fmt.Errorf("iterate failed: %s", err)
+			return 0, fmt.Errorf("iterate unmarshal failed: %s", err)
 		}
 
 		if len(currentPageBody.Errors) > 0 {
