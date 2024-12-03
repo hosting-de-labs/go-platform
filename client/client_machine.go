@@ -14,7 +14,7 @@ func (m *Machine) MachineVirtualMachinesFind(filter *RequestFilter) ([]model.Vir
 	var data []interface{}
 	_, err := m.c.Iterate(&data, &model.VirtualMachineObject{}, "machine", "virtualMachinesFind", filter, 0)
 	if err != nil {
-		return nil, fmt.Errorf("domain settings find: %s", err)
+		return nil, fmt.Errorf("virtualMachinesFind: %s", err)
 	}
 
 	var out []model.VirtualMachineObject
