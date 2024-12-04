@@ -6,7 +6,37 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/mitchellh/mapstructure"
 )
+
+type Metadata struct {
+	ClientTransactionID string `json:"clientTransactionId,omitempty"`
+	ServerTransactionID string `json:"serverTransactionId,omitempty"`
+}
+
+type EmptyResponse struct {
+	Metadata Metadata `json:"metadata,omitempty"`
+	Status   string   `json:"status,omitempty"`
+	Errors   []Error  `json:"errors,omitempty"`
+	Warnings []Error  `json:"warnings,omitempty"`
+}
+
+type FindResponseMetadata struct {
+	Limit        int    `json:"limit,omitempty"`
+	Page         int    `json:"page,omitempty"`
+	TotalEntries int    `json:"totalEntries,omitempty"`
+	TotalPages   int    `json:"totalPages,omitempty"`
+	Type         string `json:"type,omitempty"`
+}
+
+type FindResponse struct {
+	EmptyResponse
+	Response struct {
+		FindResponseMetadata
+
+		Data []map[string]interface{} `json:"data,omitempty"`
+	} `json:"response,omitempty"`
+}
 
 const (
 	IterateDefaultLimit = 250
@@ -33,17 +63,23 @@ func (c *ApiClient) Find(data *[]interface{}, T interface{}, endpoint string, rp
 		}
 		reqBody.Page = page
 
-		resp, err := c.Request(endpoint, rpcMethod, reqBody)
-		if err != nil {
-			return -1, err
-		}
-		numObjects, totalPages, err := ParseFindResponse(data, T, resp)
+		findResp := &FindResponse{}
+		err := c.ParsedRequest(endpoint, rpcMethod, reqBody, findResp, &FindResponse{})
 		if err != nil {
 			return -1, err
 		}
 
-		totalObjects += numObjects
-		if page >= totalPages {
+		if len(findResp.Errors) > 0 {
+			return -1, fmt.Errorf("server reported error: %s", findResp.Errors[0].Text)
+		}
+
+		err = iterateFindResponse(findResp, data, T)
+		if err != nil {
+			return -1, err
+		}
+
+		totalObjects += len(findResp.Response.Data)
+		if page >= findResp.Response.TotalPages {
 			break
 		}
 	}
@@ -89,4 +125,25 @@ func (c *ApiClient) request(endpoint string, rpcMethod string, body interface{})
 	}
 
 	return resp, nil
+}
+
+func decodeFindData(data interface{}, T interface{}) error {
+	err := mapstructure.Decode(data, &T)
+	if err != nil {
+		return fmt.Errorf("parse: decode failed: %s", err)
+	}
+	return nil
+}
+
+func iterateFindResponse(findResp *FindResponse, out *[]interface{}, T interface{}) error {
+	for _, data := range findResp.Response.Data {
+		err := decodeFindData(data, T)
+		if err != nil {
+			return err
+		}
+
+		*out = append(*out, T)
+	}
+
+	return nil
 }
