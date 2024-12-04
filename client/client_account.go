@@ -36,7 +36,7 @@ func (a *Account) AccountsFind(filter *RequestFilter) ([]model.AccountObject, er
 
 func (a *Account) AccountUpdate(account model.AccountObject) (*model.AccountObject, error) {
 	accOut := &model.AccountObject{}
-	err := a.c.ParsedRequest("account", "accountUpdate", AccountRequest{account}, accOut, &model.AccountObject{})
+	err := a.c.Request("account", "accountUpdate", AccountRequest{account}, accOut, &model.AccountObject{})
 	if err != nil {
 		return nil, fmt.Errorf("accountUpdate: %s", err)
 	}

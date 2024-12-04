@@ -54,7 +54,7 @@ type ZoneCreateRecreateRequest struct {
 }
 
 func (c *Dns) ZoneCreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Request("dns", "zoneCreate", zreq)
+	resp, err := c.c.RawRequest("dns", "zoneCreate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone create: %s", err)
 	}
@@ -69,7 +69,7 @@ func (c *Dns) ZoneCreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) 
 }
 
 func (c *Dns) ZoneRecreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Request("dns", "zoneRecreate", zreq)
+	resp, err := c.c.RawRequest("dns", "zoneRecreate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone recreate: %s", err)
 	}
@@ -91,7 +91,7 @@ type ZoneUpdateRequest struct {
 }
 
 func (c *Dns) ZoneUpdate(zreq ZoneUpdateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Request("dns", "zoneUpdate", zreq)
+	resp, err := c.c.RawRequest("dns", "zoneUpdate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone update: %s", err)
 	}
@@ -111,7 +111,7 @@ type ZoneDeleteRequest struct {
 }
 
 func (c *Dns) ZoneDelete(zreq ZoneDeleteRequest) (*EmptyResponse, error) {
-	resp, err := c.c.Request("dns", "zoneDelete", zreq)
+	resp, err := c.c.RawRequest("dns", "zoneDelete", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone delete: %s", err)
 	}

@@ -64,7 +64,7 @@ func (c *ApiClient) Find(data *[]interface{}, T interface{}, endpoint string, rp
 		reqBody.Page = page
 
 		findResp := &FindResponse{}
-		err := c.ParsedRequest(endpoint, rpcMethod, reqBody, findResp, &FindResponse{})
+		err := c.Request(endpoint, rpcMethod, reqBody, findResp, &FindResponse{})
 		if err != nil {
 			return -1, err
 		}
@@ -87,7 +87,7 @@ func (c *ApiClient) Find(data *[]interface{}, T interface{}, endpoint string, rp
 	return totalObjects, nil
 }
 
-func (c *ApiClient) ParsedRequest(endpoint string, rpcMethod string, body interface{}, out interface{}, T interface{}) error {
+func (c *ApiClient) Request(endpoint string, rpcMethod string, body interface{}, out interface{}, T interface{}) error {
 	resp, err := c.request(endpoint, rpcMethod, body)
 	if err != nil {
 		return fmt.Errorf("request: %s", err)
@@ -101,8 +101,8 @@ func (c *ApiClient) ParsedRequest(endpoint string, rpcMethod string, body interf
 	return nil
 }
 
-// Request fires a generic request that carries data to the server
-func (c *ApiClient) Request(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
+// RawRequest fires a generic request that carries data to the server
+func (c *ApiClient) RawRequest(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
 	resp, err := c.request(endpoint, rpcMethod, body)
 	if err != nil {
 		return nil, fmt.Errorf("request: %s", err)
