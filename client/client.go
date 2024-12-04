@@ -3,6 +3,7 @@ package client
 import "github.com/go-resty/resty/v2"
 
 type ApiClient struct {
+	Account  Account
 	Dns      Dns
 	Email    Email
 	Machine  Machine
