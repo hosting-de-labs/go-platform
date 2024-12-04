@@ -13,7 +13,7 @@ type Dns struct {
 
 func (c *Dns) ZoneConfigsFind(filter *RequestFilter) ([]model.ZoneConfigObject, error) {
 	var data []interface{}
-	_, err := c.c.Iterate(&data, &model.ZoneConfigObject{}, "dns", "zoneConfigsFind", filter, 0)
+	_, err := c.c.Find(&data, &model.ZoneConfigObject{}, "dns", "zoneConfigsFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("zones find: %s", err)
 	}
@@ -28,7 +28,7 @@ func (c *Dns) ZoneConfigsFind(filter *RequestFilter) ([]model.ZoneConfigObject, 
 
 func (c *Dns) ZonesFind(filter *RequestFilter) ([]model.ZoneObject, error) {
 	var data []interface{}
-	_, err := c.c.Iterate(&data, &model.ZoneObject{}, "dns", "zonesFind", filter, 0)
+	_, err := c.c.Find(&data, &model.ZoneObject{}, "dns", "zonesFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("zones find: %s", err)
 	}
@@ -54,7 +54,7 @@ type ZoneCreateRecreateRequest struct {
 }
 
 func (c *Dns) ZoneCreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Update("dns", "zoneCreate", zreq)
+	resp, err := c.c.Request("dns", "zoneCreate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone create: %s", err)
 	}
@@ -69,7 +69,7 @@ func (c *Dns) ZoneCreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) 
 }
 
 func (c *Dns) ZoneRecreate(zreq ZoneCreateRecreateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Update("dns", "zoneRecreate", zreq)
+	resp, err := c.c.Request("dns", "zoneRecreate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone recreate: %s", err)
 	}
@@ -91,7 +91,7 @@ type ZoneUpdateRequest struct {
 }
 
 func (c *Dns) ZoneUpdate(zreq ZoneUpdateRequest) (*ZoneResponse, error) {
-	resp, err := c.c.Update("dns", "zoneUpdate", zreq)
+	resp, err := c.c.Request("dns", "zoneUpdate", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone update: %s", err)
 	}
@@ -111,7 +111,7 @@ type ZoneDeleteRequest struct {
 }
 
 func (c *Dns) ZoneDelete(zreq ZoneDeleteRequest) (*EmptyResponse, error) {
-	resp, err := c.c.Update("dns", "zoneDelete", zreq)
+	resp, err := c.c.Request("dns", "zoneDelete", zreq)
 	if err != nil {
 		return nil, fmt.Errorf("zone delete: %s", err)
 	}

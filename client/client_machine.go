@@ -12,7 +12,7 @@ type Machine struct {
 
 func (m *Machine) MachineVirtualMachinesFind(filter *RequestFilter) ([]model.VirtualMachineObject, error) {
 	var data []interface{}
-	_, err := m.c.Iterate(&data, &model.VirtualMachineObject{}, "machine", "virtualMachinesFind", filter, 0)
+	_, err := m.c.Find(&data, &model.VirtualMachineObject{}, "machine", "virtualMachinesFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("virtualMachinesFind: %s", err)
 	}

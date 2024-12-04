@@ -6,54 +6,44 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/mitchellh/mapstructure"
 )
 
 const (
 	IterateDefaultLimit = 250
 )
 
-type GetRequest struct {
+type findRequest struct {
 	Limit  int            `json:"limit,omitempty"`
 	Page   int            `json:"page,omitempty"`
 	Filter *RequestFilter `json:"filter,omitempty"`
 }
 
-func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string, rpcMethod string, filter *RequestFilter, page int) (int, error) {
+func (c *ApiClient) Find(data *[]interface{}, T interface{}, endpoint string, rpcMethod string, filter *RequestFilter, limit int) (int, error) {
 	totalObjects := 0
-	for i := 0; ; i++ {
-		currentPage := 1 + i
-		if page >= 1 {
-			currentPage = page + i
+	for page := 1; ; page++ {
+		reqBody := &findRequest{}
+
+		if filter != nil {
+			reqBody.Filter = filter
 		}
 
-		resp, err := c.Get(endpoint, rpcMethod, filter, IterateDefaultLimit, currentPage)
+		reqBody.Limit = IterateDefaultLimit
+		if limit > 0 {
+			reqBody.Limit = limit
+		}
+		reqBody.Page = page
+
+		resp, err := c.Request(endpoint, rpcMethod, reqBody)
 		if err != nil {
-			return 0, fmt.Errorf("iterate get failed: %s", err)
+			return -1, err
 		}
-
-		var currentPageBody DataResponse
-		err = json.Unmarshal(resp.Body(), &currentPageBody)
+		numObjects, totalPages, err := ParseFindResponse(data, T, resp)
 		if err != nil {
-			return 0, fmt.Errorf("iterate unmarshal failed: %s", err)
+			return -1, err
 		}
 
-		if len(currentPageBody.Errors) > 0 {
-			return 0, fmt.Errorf("iterate: %s", currentPageBody.Errors[0].Text)
-		}
-
-		totalObjects += len(currentPageBody.Response.Data)
-
-		for _, r := range currentPageBody.Response.Data {
-			err := mapstructure.Decode(r, &T)
-			if err != nil {
-				panic(err)
-			}
-
-			*data = append(*data, T)
-		}
-
-		if currentPage >= currentPageBody.Response.TotalPages {
+		totalObjects += numObjects
+		if page >= totalPages {
 			break
 		}
 	}
@@ -61,50 +51,38 @@ func (c *ApiClient) Iterate(data *[]interface{}, T interface{}, endpoint string,
 	return totalObjects, nil
 }
 
-// Get fires a generic request that will not push any further data to the api.
-func (c *ApiClient) Get(endpoint string, rpcMethod string, filter *RequestFilter, limit int, page int) (*resty.Response, error) {
-	reqBody := &GetRequest{}
-
-	if filter != nil {
-		reqBody.Filter = filter
-	}
-
-	reqBody.Limit = c.limit
-	if limit > 0 {
-		reqBody.Limit = limit
-	}
-
-	reqBody.Page = 1
-	if page > 0 {
-		reqBody.Page = page
-	}
-
-	requestURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
-
-	base64Token := base64.StdEncoding.EncodeToString([]byte(c.token))
-	resp, err := c.client.R().
-		SetHeader("Authorization", "Bearer "+base64Token).
-		SetHeader("Content-Type", "application/json").
-		SetBody(reqBody).
-		Post(requestURL)
-
+func (c *ApiClient) ParsedRequest(endpoint string, rpcMethod string, body interface{}, out interface{}, T interface{}) error {
+	resp, err := c.request(endpoint, rpcMethod, body)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %s", err)
+		return fmt.Errorf("request: %s", err)
+	}
+
+	err = json.Unmarshal(resp.Body(), &out)
+	if err != nil {
+		return fmt.Errorf("parse: unmarshal failed: %s", err)
+	}
+
+	return nil
+}
+
+// Request fires a generic request that carries data to the server
+func (c *ApiClient) Request(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
+	resp, err := c.request(endpoint, rpcMethod, body)
+	if err != nil {
+		return nil, fmt.Errorf("request: %s", err)
 	}
 
 	return resp, nil
 }
 
-// Update fires a generic request that carries data to the server
-func (c *ApiClient) Update(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
-	requestURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
-
+func (c *ApiClient) request(endpoint string, rpcMethod string, body interface{}) (*resty.Response, error) {
+	reqURL := fmt.Sprintf("%s/%s/v1/json/%s", c.url, endpoint, rpcMethod)
 	base64Token := base64.StdEncoding.EncodeToString([]byte(c.token))
 	resp, err := c.client.R().
 		SetHeader("Authorization", "Bearer "+base64Token).
 		SetHeader("Content-Type", "application/json").
 		SetBody(body).
-		Post(requestURL)
+		Post(reqURL)
 
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %s", err)

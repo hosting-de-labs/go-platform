@@ -12,7 +12,7 @@ type Resource struct {
 
 func (r *Resource) ResourceVirtualMachineHostsFind(filter *RequestFilter) ([]model.VirtualMachineHostObject, error) {
 	var data []interface{}
-	_, err := r.c.Iterate(&data, &model.VirtualMachineHostObject{}, "resource", "virtualMachineHostsFind", filter, 0)
+	_, err := r.c.Find(&data, &model.VirtualMachineHostObject{}, "resource", "virtualMachineHostsFind", filter, 0)
 	if err != nil {
 		return nil, fmt.Errorf("domain settings find: %s", err)
 	}
