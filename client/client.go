@@ -29,6 +29,7 @@ func NewApiClient(url string, token string, limit int) *ApiClient {
 
 	c.client = resty.New()
 
+	c.Account.c = c
 	c.Dns.c = c
 	c.Email.c = c
 	c.Machine.c = c
