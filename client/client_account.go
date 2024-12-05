@@ -19,11 +19,11 @@ type AccountResponse struct {
 	Response model.AccountObject
 }
 
-func (a *Account) AccountsFind(filter *RequestFilter) ([]model.AccountObject, error) {
+func (a *Account) SubaccountsFind(filter *RequestFilter) ([]model.AccountObject, error) {
 	var data []interface{}
-	_, err := a.c.Find(&data, &model.AccountObject{}, "account", "accountsFind", filter, 0)
+	_, err := a.c.Find(&data, &model.AccountObject{}, "subaccount", "accountsFind", filter, 0)
 	if err != nil {
-		return nil, fmt.Errorf("accountsFind: %s", err)
+		return nil, fmt.Errorf("subaccount: %s", err)
 	}
 
 	var out []model.AccountObject
@@ -34,11 +34,11 @@ func (a *Account) AccountsFind(filter *RequestFilter) ([]model.AccountObject, er
 	return out, nil
 }
 
-func (a *Account) AccountUpdate(account model.AccountObject) (*model.AccountObject, error) {
+func (a *Account) SubaccountUpdate(account model.AccountObject) (*model.AccountObject, error) {
 	accOut := &model.AccountObject{}
-	err := a.c.Request("account", "accountUpdate", AccountRequest{account}, accOut, &model.AccountObject{})
+	err := a.c.Request("account", "subaccountUpdate", AccountRequest{account}, accOut, &model.AccountObject{})
 	if err != nil {
-		return nil, fmt.Errorf("accountUpdate: %s", err)
+		return nil, fmt.Errorf("subaccountUpdate: %s", err)
 	}
 
 	return accOut, nil
