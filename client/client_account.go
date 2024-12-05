@@ -21,9 +21,9 @@ type AccountResponse struct {
 
 func (a *Account) SubaccountsFind(filter *RequestFilter) ([]model.AccountObject, error) {
 	var data []interface{}
-	_, err := a.c.Find(&data, &model.AccountObject{}, "subaccount", "accountsFind", filter, 0)
+	_, err := a.c.Find(&data, &model.AccountObject{}, "account", "subaccountsFind", filter, 0)
 	if err != nil {
-		return nil, fmt.Errorf("subaccount: %s", err)
+		return nil, fmt.Errorf("subaccountsFind: %s", err)
 	}
 
 	var out []model.AccountObject
