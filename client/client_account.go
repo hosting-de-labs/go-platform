@@ -11,7 +11,7 @@ type Account struct {
 }
 
 type AccountRequest struct {
-	Account model.AccountObject `json:"account"`
+	Account model.AccountObject `json:"subaccount"`
 }
 
 type AccountResponse struct {
